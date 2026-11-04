@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOIR | Dark Fashion</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: #1a1a1a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #888888;
+            --accent: #c9a87c;
+            --accent-dim: #8a6e4b;
+            --border: #222222;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-weight: 300;
+            line-height: 1.7;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: var(--accent); color: var(--bg-primary); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 3px; }
+
+        /* ========== NAVIGATION ========== */
+        .nav {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            transition: transform 0.4s var(--transition-smooth);
+        }
+        .nav.hidden { transform: translateY(-100%); }
+        .nav-logo {
+            font-family: var(--font-display); font-size: 1.6rem; font-weight: 900;
+            letter-spacing: 0.3em; color: var(--text-primary); text-decoration: none; text-transform: uppercase;
+        }
+        .nav-logo span { color: var(--accent); }
+        .nav-links { display: flex; list-style: none; gap: 2.5rem; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration: none; font-size: 0.8rem;
+            letter-spacing: 0.15em; text-transform: uppercase; font-weight: 400;
+            position: relative; padding: 0.3rem 0; transition: color 0.3s ease;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px;
+            background: var(--accent); transition: width 0.4s var(--transition-smooth);
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+        .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 5px; }
+        .nav-toggle span { display: block; width: 25px; height: 1.5px; background: var(--text-primary); transition: all 0.3s ease; }
+
+        /* ========== PAGES ========== */
+        .page { display: none; min-height: 100vh; padding-top: 6rem; animation: fadeIn 0.6s ease forwards; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ========== UTILITY ========== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 4rem; }
+        .section-title { font-family: var(--font-display); font-size: 3rem; font-weight: 400; letter-spacing: 0.05em; margin-bottom: 1rem; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 3rem; font-weight: 500; }
+        .gold-line { width: 60px; height: 1px; background: var(--accent); margin: 2rem 0; }
+
+        .btn {
+            display: inline-block; padding: 1rem 2.8rem; border: 1px solid var(--accent);
+            color: var(--accent); text-decoration: none; font-size: 0.75rem;
+            letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500;
+            background: transparent; cursor: pointer; transition: all 0.4s var(--transition-smooth);
+            position: relative; overflow: hidden; font-family: var(--font-body);
+        }
+        .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--accent); transition: left 0.4s var(--transition-smooth); z-index: -1; }
+        .btn:hover { color: var(--bg-primary); }
+        .btn:hover::before { left: 0; }
+        .btn-solid { background: var(--accent); color: var(--bg-primary); }
+        .btn-solid::before { background: var(--text-primary); }
+        .btn-solid:hover { color: var(--bg-primary); border-color: var(--text-primary); }
+
+        /* ========== IMAGE PLACEHOLDER ========== */
+        .img-bg {
+            background-color: var(--bg-card);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        .img-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201,168,124,0.08) 0%, rgba(10,10,10,0.6) 100%);
+            z-index: 0;
+        }
+
+        /* ========== PAGE 1: HOME ========== */
+        #page-home .hero { height: calc(100vh - 6rem); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+        #page-home .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 70% 50%, rgba(201, 168, 124, 0.08) 0%, transparent 60%), radial-gradient(ellipse at 20% 80%, rgba(201, 168, 124, 0.05) 0%, transparent 50%); z-index: 0; }
+        #page-home .hero-content { position: relative; z-index: 1; max-width: 700px; }
+        #page-home .hero-label { font-size: 0.7rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--accent); margin-bottom: 2rem; font-weight: 500; }
+        #page-home .hero-title { font-family: var(--font-display); font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 2rem; }
+        #page-home .hero-title em { font-style: italic; color: var(--accent); }
+        #page-home .hero-desc { font-size: 1rem; color: var(--text-secondary); max-width: 450px; margin-bottom: 3rem; line-height: 1.8; }
+        #page-home .hero-cta { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        #page-home .hero-scroll { position: absolute; bottom: 3rem; right: 4rem; display: flex; align-items: center; gap: 1rem; color: var(--text-secondary); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; writing-mode: vertical-rl; }
+        #page-home .hero-scroll::after { content: ''; width: 1px; height: 60px; background: var(--accent); animation: scrollPulse 2s ease-in-out infinite; }
+        @keyframes scrollPulse { 0%, 100% { opacity: 1; transform: scaleY(1); } 50% { opacity: 0.3; transform: scaleY(0.6); } }
+
+        #page-home .featured { padding: 8rem 0; border-top: 1px solid var(--border); }
+        #page-home .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
+        #page-home .featured-card { position: relative; aspect-ratio: 3/4; background: var(--bg-card); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: transform 0.5s var(--transition-smooth); }
+        #page-home .featured-card:hover { transform: translateY(-8px); }
+        #page-home .featured-card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 2.5rem; background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 60%); transition: background 0.5s ease; z-index: 2; }
+        #page-home .featured-card:hover .featured-card-inner { background: linear-gradient(to top, rgba(10,10,10,0.98) 0%, rgba(201,168,124,0.05) 100%); }
+        #page-home .featured-num { font-family: var(--font-display); font-size: 4rem; font-weight: 900; color: rgba(201, 168, 124, 0.15); position: absolute; top: 1.5rem; right: 2rem; line-height: 1; }
+        #page-home .featured-card h3 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; margin-bottom: 0.5rem; }
+        #page-home .featured-card p { font-size: 0.85rem; color: var(--text-secondary); }
+
+        /* ========== PAGE 2: COLLECTIONS ========== */
+        #page-collections .collections-intro { padding: 4rem 0 6rem; display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: end; }
+        #page-collections .collections-intro .section-title { font-size: 4rem; }
+        #page-collections .collections-intro p { color: var(--text-secondary); font-size: 0.95rem; }
+        #page-collections .collection-list { border-top: 1px solid var(--border); }
+        #page-collections .collection-item { display: grid; grid-template-columns: 80px 1fr 1fr 120px; gap: 2rem; align-items: center; padding: 3rem 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.4s var(--transition-smooth); position: relative; }
+        #page-collections .collection-item:hover { padding-left: 1.5rem; background: rgba(201, 168, 124, 0.03); }
+        #page-collections .collection-item:hover .collection-arrow { transform: translateX(8px); color: var(--accent); }
+        #page-collections .collection-num { font-family: var(--font-display); font-size: 0.9rem; color: var(--accent); letter-spacing: 0.1em; }
+        #page-collections .collection-item h3 { font-family: var(--font-display); font-size: 2rem; font-weight: 400; transition: color 0.3s ease; }
+        #page-collections .collection-item:hover h3 { color: var(--accent); }
+        #page-collections .collection-item .collection-desc { color: var(--text-secondary); font-size: 0.85rem; }
+        #page-collections .collection-arrow { font-size: 1.5rem; color: var(--text-secondary); transition: all 0.4s var(--transition-smooth); text-align: right; }
+
+        /* ========== MODAL (общий) ========== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+            padding: 2rem; animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--bg-secondary); border: 1px solid var(--border);
+            max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto;
+            position: relative; display: grid; grid-template-columns: 1fr 1fr;
+            animation: modalIn 0.4s var(--transition-smooth);
+        }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-image {
+            min-height: 400px;
+            background-size: cover; background-position: center;
+            background-color: var(--bg-card);
+            position: relative;
+        }
+        .modal-image::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to right, transparent 60%, var(--bg-secondary) 100%);
+        }
+        .modal-content { padding: 3rem; display: flex; flex-direction: column; justify-content: center; }
+        .modal-close {
+            position: absolute; top: 1rem; right: 1rem; z-index: 10;
+            background: none; border: 1px solid var(--border); color: var(--text-primary);
+            width: 40px; height: 40px; cursor: pointer; font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .modal-close:hover { border-color: var(--accent); color: var(--accent); }
+        .modal-content .section-subtitle { margin-bottom: 1rem; }
+        .modal-content h3 { font-family: var(--font-display); font-size: 2.5rem; font-weight: 400; margin-bottom: 1.5rem; line-height: 1.2; }
+        .modal-content p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.5rem; }
+        .modal-items { list-style: none; margin-bottom: 2rem; }
+        .modal-items li { padding: 0.8rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; display: flex; justify-content: space-between; }
+        .modal-items li span:first-child { color: var(--text-primary); }
+        .modal-items li span:last-child { color: var(--accent); font-size: 0.75rem; letter-spacing: 0.1em; }
+
+        /* ========== ARTICLE MODAL ========== */
+        .article-modal {
+            max-width: 800px;
+            display: block;
+            grid-template-columns: 1fr;
+        }
+        .article-modal .article-hero {
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--bg-card);
+        }
+        .article-modal .article-body { padding: 3rem; }
+        .article-modal .journal-meta { margin-bottom: 1.5rem; }
+        .article-modal h3 {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            font-weight: 400;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        .article-modal p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.9;
+            margin-bottom: 1.2rem;
+        }
+        .article-modal p:first-of-type::first-letter {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            float: left;
+            line-height: 0.8;
+            padding-right: 0.8rem;
+            padding-top: 0.4rem;
+            color: var(--accent);
+        }
+
+        /* ========== PAGE 3: LOOKBOOK ========== */
+        #page-lookbook .lookbook-header { text-align: center; padding: 3rem 0 5rem; }
+        #page-lookbook .lookbook-header .section-title { font-size: 4.5rem; font-style: italic; font-weight: 400; }
+        #page-lookbook .lookbook-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 1.2rem; padding-bottom: 6rem; }
+        #page-lookbook .lookbook-item { position: relative; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border); cursor: pointer; background-size: cover; background-position: center; }
+        #page-lookbook .lookbook-item:nth-child(1) { grid-column: span 2; grid-row: span 2; }
+        #page-lookbook .lookbook-item:nth-child(2) { grid-column: span 2; grid-row: span 1; }
+        #page-lookbook .lookbook-item:nth-child(3) { grid-row: span 1; }
+        #page-lookbook .lookbook-item:nth-child(4) { grid-row: span 1; }
+        #page-lookbook .lookbook-item:nth-child(5) { grid-column: span 2; grid-row: span 1; }
+        #page-lookbook .lookbook-item:nth-child(6) { grid-row: span 1; }
+        #page-lookbook .lookbook-item:nth-child(7) { grid-row: span 1; }
+        #page-lookbook .lookbook-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,0.9) 0%, transparent 50%); opacity: 0; transition: opacity 0.5s ease; }
+        #page-lookbook .lookbook-item:hover::after { opacity: 1; }
+        #page-lookbook .lookbook-caption { position: absolute; bottom: 1.5rem; left: 1.5rem; z-index: 2; opacity: 0; transform: translateY(15px); transition: all 0.5s var(--transition-smooth); }
+        #page-lookbook .lookbook-item:hover .lookbook-caption { opacity: 1; transform: translateY(0); }
+        #page-lookbook .lookbook-caption span { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.3rem; }
+        #page-lookbook .lookbook-caption h4 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 400; }
+
+        /* ========== PAGE 4: ABOUT ========== */
+        #page-about .about-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; padding: 4rem 0 6rem; align-items: center; }
+        #page-about .about-hero .section-title { font-size: 4rem; line-height: 1.1; }
+        #page-about .about-hero .section-title em { font-style: italic; color: var(--accent); }
+        #page-about .about-text { color: var(--text-secondary); font-size: 0.95rem; line-height: 2; }
+        #page-about .about-text p { margin-bottom: 1.5rem; }
+        #page-about .about-visual { aspect-ratio: 4/5; background: var(--bg-card); border: 1px solid var(--border); position: relative; overflow: hidden; background-size: cover; background-position: center; }
+        #page-about .about-visual::before { content: ''; position: absolute; inset: 20px; border: 1px solid rgba(201, 168, 124, 0.2); z-index: 1; }
+        #page-about .about-visual .visual-label { position: absolute; bottom: 2rem; left: 2rem; font-family: var(--font-display); font-size: 0.8rem; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; z-index: 2; }
+        #page-about .about-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding: 5rem 0; border-top: 1px solid var(--border); }
+        #page-about .value-card { padding: 2rem 0; }
+        #page-about .value-card .value-num { font-family: var(--font-display); font-size: 0.8rem; color: var(--accent); letter-spacing: 0.2em; margin-bottom: 1rem; }
+        #page-about .value-card h4 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 400; margin-bottom: 1rem; }
+        #page-about .value-card p { color: var(--text-secondary); font-size: 0.85rem; }
+
+        /* ========== PAGE 5: JOURNAL ========== */
+        #page-journal .journal-header { padding: 3rem 0 4rem; display: flex; justify-content: space-between; align-items: flex-end; }
+        #page-journal .journal-header .section-title { font-size: 4rem; }
+        #page-journal .journal-filters { display: flex; gap: 1.5rem; }
+        #page-journal .journal-filters span { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-secondary); cursor: pointer; padding: 0.3rem 0; border-bottom: 1px solid transparent; transition: all 0.3s ease; }
+        #page-journal .journal-filters span.active, #page-journal .journal-filters span:hover { color: var(--accent); border-bottom-color: var(--accent); }
+        #page-journal .journal-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 3rem; padding-bottom: 6rem; }
+        #page-journal .journal-card { border: 1px solid var(--border); background: var(--bg-card); padding: 3rem; transition: all 0.4s var(--transition-smooth); cursor: pointer; position: relative; }
+        #page-journal .journal-card:hover { border-color: var(--accent-dim); transform: translateY(-5px); }
+        #page-journal .journal-card.featured-article { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; padding: 0; overflow: hidden; }
+        #page-journal .journal-card.featured-article .featured-content { padding: 3rem; }
+        #page-journal .journal-card.featured-article .featured-visual { height: 100%; min-height: 350px; background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%); display: flex; align-items: center; justify-content: center; position: relative; background-size: cover; background-position: center; }
+        #page-journal .journal-meta { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+        #page-journal .journal-card h3 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; margin-bottom: 1rem; line-height: 1.3; transition: color 0.3s ease; }
+        #page-journal .journal-card:hover h3 { color: var(--accent); }
+        #page-journal .journal-card p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; }
+        #page-journal .read-more { display: inline-block; margin-top: 1.5rem; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); text-decoration: none; cursor: pointer; transition: letter-spacing 0.3s ease; }
+        #page-journal .read-more:hover { letter-spacing: 0.25em; }
+        #page-journal .journal-card.hidden { display: none; }
+
+        /* ========== PAGE 6: CONTACT ========== */
+        #page-contact .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; padding: 3rem 0 6rem; min-height: calc(100vh - 20rem); }
+        #page-contact .contact-info .section-title { font-size: 4rem; margin-bottom: 2rem; }
+        #page-contact .contact-info > p { color: var(--text-secondary); margin-bottom: 3rem; max-width: 400px; }
+        #page-contact .contact-details { display: flex; flex-direction: column; gap: 2rem; }
+        #page-contact .contact-detail { border-left: 1px solid var(--accent-dim); padding-left: 1.5rem; }
+        #page-contact .contact-detail .label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+        #page-contact .contact-detail p { font-size: 0.95rem; color: var(--text-primary); }
+        #page-contact .contact-form { display: flex; flex-direction: column; gap: 2rem; }
+        #page-contact .form-group { position: relative; }
+        #page-contact .form-group label { display: block; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.7rem; }
+        #page-contact .form-group input, #page-contact .form-group textarea, #page-contact .form-group select { width: 100%; padding: 1rem 0; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text-primary); font-family: var(--font-body); font-size: 0.95rem; font-weight: 300; outline: none; transition: border-color 0.3s ease; border-radius: 0; }
+        #page-contact .form-group input:focus, #page-contact .form-group textarea:focus, #page-contact .form-group select:focus { border-bottom-color: var(--accent); }
+        #page-contact .form-group textarea { resize: vertical; min-height: 120px; }
+        #page-contact .form-group select option { background: var(--bg-primary); color: var(--text-primary); }
+        #page-contact .form-submit { align-self: flex-start; margin-top: 1rem; }
+
+        /* ========== FOOTER ========== */
+        .footer { border-top: 1px solid var(--border); padding: 3rem 4rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-secondary); }
+        .footer-socials { display: flex; gap: 2rem; }
+        .footer-socials a { color: var(--text-secondary); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.7rem; transition: color 0.3s ease; }
+        .footer-socials a:hover { color: var(--accent); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .nav { padding: 1.2rem 2rem; }
+            .container { padding: 0 2rem; }
+            #page-home .featured-grid { grid-template-columns: 1fr 1fr; }
+            #page-collections .collections-intro { grid-template-columns: 1fr; gap: 2rem; }
+            #page-lookbook .lookbook-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; }
+            #page-lookbook .lookbook-item:nth-child(1) { grid-column: span 2; }
+            #page-about .about-hero { grid-template-columns: 1fr; gap: 3rem; }
+            #page-contact .contact-layout { grid-template-columns: 1fr; gap: 4rem; }
+            #page-journal .journal-card.featured-article { grid-template-columns: 1fr; }
+            .modal { grid-template-columns: 1fr; }
+            .modal-image { min-height: 250px; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { position: fixed; top: 0; right: -100%; width: 70%; height: 100vh; background: var(--bg-secondary); flex-direction: column; justify-content: center; align-items: center; gap: 2rem; transition: right 0.5s var(--transition-smooth); border-left: 1px solid var(--border); }
+            .nav-links.open { right: 0; }
+            .nav-links a { font-size: 1rem; }
+            .nav-toggle { display: flex; }
+            .nav { padding: 1rem 1.5rem; }
+            .container { padding: 0 1.5rem; }
+            #page-home .hero { height: auto; padding: 6rem 0 4rem; }
+            #page-home .hero-title { font-size: clamp(2.5rem, 10vw, 4rem); }
+            #page-home .hero-scroll { display: none; }
+            #page-home .featured-grid { grid-template-columns: 1fr; }
+            #page-home .featured { padding: 4rem 0; }
+            .section-title { font-size: 2rem !important; }
+            #page-collections .collection-item { grid-template-columns: 40px 1fr; gap: 1rem; }
+            #page-collections .collection-item .collection-desc, #page-collections .collection-arrow { display: none; }
+            #page-lookbook .lookbook-grid { grid-template-columns: 1fr 1fr; grid-auto-rows: 150px; }
+            #page-lookbook .lookbook-item:nth-child(1) { grid-column: span 2; }
+            #page-about .about-values { grid-template-columns: 1fr; gap: 1rem; }
+            #page-journal .journal-grid { grid-template-columns: 1fr; }
+            #page-journal .journal-card.featured-article { grid-column: span 1; }
+            #page-journal .journal-header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+            #page-contact .contact-layout { grid-template-columns: 1fr; }
+            .footer { flex-direction: column; gap: 1.5rem; padding: 2rem 1.5rem; text-align: center; }
+            #page-journal .journal-card { padding: 2rem; }
+            .modal-content { padding: 2rem; }
+            .article-modal .article-body { padding: 2rem; }
+            .article-modal h3 { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 480px) {
+            #page-lookbook .lookbook-grid { grid-template-columns: 1fr; }
+            #page-lookbook .lookbook-item:nth-child(n) { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav" id="mainNav">
+        <a href="#" class="nav-logo" data-page="home">N<span>O</span>IR</a>
+        <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#" data-page="home" class="active">Главная</a></li>
+            <li><a href="#" data-page="collections">Коллекции</a></li>
+            <li><a href="#" data-page="lookbook">Лукбук</a></li>
+            <li><a href="#" data-page="about">О бренде</a></li>
+            <li><a href="#" data-page="journal">Журнал</a></li>
+            <li><a href="#" data-page="contact">Контакты</a></li>
+        </ul>
+    </nav>
+
+    <!-- ========== PAGE 1: HOME ========== -->
+    <section class="page active" id="page-home">
+        <div class="hero">
+            <div class="hero-bg"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-label">Осень / Зима 2026</div>
+                    <h1 class="hero-title">Тёмная<br><em>элегантность</em></h1>
+                    <p class="hero-desc">Минимализм, который говорит громче слов. NOIR — это исследование формы, тени и безупречного кроя для тех, кто выбирает тишину вместо шума.</p>
+                    <div class="hero-cta">
+                        <a href="#" class="btn" data-page="collections">Смотреть коллекции</a>
+                        <a href="#" class="btn btn-solid" data-page="lookbook">Лукбук</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-scroll">Скролл</div>
+        </div>
+
+        <div class="container featured">
+            <div class="section-subtitle">Избранное</div>
+            <h2 class="section-title">Ключевые образы</h2>
+            <div class="featured-grid">
+                <div class="featured-card img-bg" data-page="collections" style="background-image: url('https://picsum.photos/id/1011/600/800?grayscale');">
+                    <div class="featured-card-inner">
+                        <span class="featured-num">01</span>
+                        <h3>Архитектура тени</h3>
+                        <p>Структурные силуэты и монохромные слои</p>
+                    </div>
+                </div>
+                <div class="featured-card img-bg" data-page="collections" style="background-image: url('https://picsum.photos/id/1027/600/800?grayscale');">
+                    <div class="featured-card-inner">
+                        <span class="featured-num">02</span>
+                        <h3>Тихая роскошь</h3>
+                        <p>Шёлк, кашемир и ручная вышивка</p>
+                    </div>
+                </div>
+                <div class="featured-card img-bg" data-page="collections" style="background-image: url('https://picsum.photos/id/1040/600/800?grayscale');">
+                    <div class="featured-card-inner">
+                        <span class="featured-num">03</span>
+                        <h3>Городской ритуал</h3>
+                        <p>Адаптивные формы для повседневности</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PAGE 2: COLLECTIONS ========== -->
+    <section class="page" id="page-collections">
+        <div class="container">
+            <div class="collections-intro">
+                <div>
+                    <div class="section-subtitle">Архив</div>
+                    <h2 class="section-title">Коллекции</h2>
+                </div>
+                <p>Каждая коллекция NOIR — это законченное высказывание. Нажмите на любую коллекцию, чтобы узнать подробнее о концепции и ключевых вещах.</p>
+            </div>
+            <div class="collection-list">
+                <div class="collection-item" data-collection="monolith">
+                    <span class="collection-num">01</span>
+                    <h3>Monolith</h3>
+                    <p class="collection-desc">Осень / Зима 2026 — структурный минимализм</p>
+                    <span class="collection-arrow">→</span>
+                </div>
+                <div class="collection-item" data-collection="obsidian">
+                    <span class="collection-num">02</span>
+                    <h3>Obsidian</h3>
+                    <p class="collection-desc">Весна / Лето 2025 — текучие формы</p>
+                    <span class="collection-arrow">→</span>
+                </div>
+                <div class="collection-item" data-collection="void">
+                    <span class="collection-num">03</span>
+                    <h3>Void</h3>
+                    <p class="collection-desc">Осень / Зима 2024 — монохром и текстура</p>
+                    <span class="collection-arrow">→</span>
+                </div>
+                <div class="collection-item" data-collection="eclipse">
+                    <span class="collection-num">04</span>
+                    <h3>Eclipse</h3>
+                    <p class="collection-desc">Весна / Лето 2024 — игра света и тени</p>
+                    <span class="collection-arrow">→</span>
+                </div>
+                <div class="collection-item" data-collection="archive">
+                    <span class="collection-num">05</span>
+                    <h3>Archive 001</h3>
+                    <p class="collection-desc">Капсула — переосмысление классики</p>
+                    <span class="collection-arrow">→</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== MODAL КОЛЛЕКЦИЙ ========== -->
+    <div class="modal-overlay" id="collectionModal">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">✕</button>
+            <div class="modal-image" id="modalImage"></div>
+            <div class="modal-content">
+                <div class="section-subtitle" id="modalSeason"></div>
+                <h3 id="modalTitle"></h3>
+                <p id="modalDesc"></p>
+                <ul class="modal-items" id="modalItems"></ul>
+                <a href="#" class="btn" data-page="lookbook" id="modalBtn">Смотреть лукбук</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL СТАТЬИ ========== -->
+    <div class="modal-overlay" id="articleModal">
+        <div class="modal article-modal">
+            <button class="modal-close" id="articleClose">✕</button>
+            <div class="article-hero" id="articleHero"></div>
+            <div class="article-body">
+                <div class="journal-meta" id="articleMeta"></div>
+                <h3 id="articleTitle"></h3>
+                <div id="articleText"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PAGE 3: LOOKBOOK ========== -->
+    <section class="page" id="page-lookbook">
+        <div class="container">
+            <div class="lookbook-header">
+                <div class="section-subtitle">Визуальный дневник</div>
+                <h2 class="section-title">Lookbook</h2>
+            </div>
+            <div class="lookbook-grid">
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1005/800/800?grayscale');">
+                    <div class="lookbook-caption"><span>Look 01</span><h4>Структурный плащ</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1012/800/600?grayscale');">
+                    <div class="lookbook-caption"><span>Look 02</span><h4>Кашемировое пальто</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1025/500/500?grayscale');">
+                    <div class="lookbook-caption"><span>Look 03</span><h4>Шелковая рубашка</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1035/500/500?grayscale');">
+                    <div class="lookbook-caption"><span>Look 04</span><h4>Кожаные брюки</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1043/800/500?grayscale');">
+                    <div class="lookbook-caption"><span>Look 05</span><h4>Вязаный жакет</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1050/500/500?grayscale');">
+                    <div class="lookbook-caption"><span>Look 06</span><h4>Асимметричное платье</h4></div>
+                </div>
+                <div class="lookbook-item img-bg" style="background-image: url('https://picsum.photos/id/1062/500/500?grayscale');">
+                    <div class="lookbook-caption"><span>Look 07</span><h4>Объемный шарф</h4></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PAGE 4: ABOUT ========== -->
+    <section class="page" id="page-about">
+        <div class="container">
+            <div class="about-hero">
+                <div>
+                    <div class="section-subtitle">Философия</div>
+                    <h2 class="section-title">О <em>бренде</em></h2>
+                    <div class="gold-line"></div>
+                </div>
+                <div class="about-text">
+                    <p>NOIR родился из убеждения, что истинная элегантность не кричит. Это разговор шёпотом, который слышен громче любого крика. Мы создаём одежду для тех, кто ценит форму, материал и тишину.</p>
+                    <p>Каждая вещь проходит путь от эскиза до финального стежка в наших ателье. Мы работаем с малыми партиями, используя только натуральные и переработанные материалы премиального качества.</p>
+                </div>
+                <div class="about-visual img-bg" style="background-image: url('https://picsum.photos/id/1074/800/1000?grayscale');">
+                    <div class="visual-label">Atelier NOIR — Paris</div>
+                </div>
+            </div>
+            <div class="about-values">
+                <div class="value-card"><div class="value-num">01</div><h4>Форма</h4><p>Каждый силуэт выверен до миллиметра. Мы верим, что архитектура кроя важнее декора.</p></div>
+                <div class="value-card"><div class="value-num">02</div><h4>Материал</h4><p>Только натуральные волокна и переработанные ткани. Тактильность — часть нашего языка.</p></div>
+                <div class="value-card"><div class="value-num">03</div><h4>Время</h4><p>Мы создаём вещи вне сезонов. Одежда NOIR остаётся актуальной десятилетиями.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PAGE 5: JOURNAL ========== -->
+    <section class="page" id="page-journal">
+        <div class="container">
+            <div class="journal-header">
+                <div>
+                    <div class="section-subtitle">Медиа</div>
+                    <h2 class="section-title">Журнал</h2>
+                </div>
+                <div class="journal-filters" id="journalFilters">
+                    <span class="active" data-filter="all">Все</span>
+                    <span data-filter="fashion">Мода</span>
+                    <span data-filter="culture">Культура</span>
+                    <span data-filter="atelier">Ателье</span>
+                </div>
+            </div>
+            <div class="journal-grid" id="journalGrid">
+                <!-- Избранная статья -->
+                <article class="journal-card featured-article" data-category="fashion" data-article="monolith-anatomy">
+                    <div class="featured-content">
+                        <div class="journal-meta"><span>Мода</span><span>15 окт 2026</span></div>
+                        <h3>Анатомия тени: как мы создаём коллекцию Monolith</h3>
+                        <p>За кулисами осенне-зимней коллекции — от первых эскизов до финального показа. Разговор с креативным директором о структуре, объёме и тишине.</p>
+                        <span class="read-more">Читать далее →</span>
+                    </div>
+                    <div class="featured-visual img-bg" style="background-image: url('https://picsum.photos/id/1084/800/600?grayscale');"></div>
+                </article>
+
+                <!-- Статья 2 -->
+                <article class="journal-card" data-category="culture" data-article="noir-cinema">
+                    <div class="journal-meta"><span>Культура</span><span>02 окт 2026</span></div>
+                    <h3>Тёмный минимализм в кино</h3>
+                    <p>Как визуальный язык нуара повлиял на современную моду.</p>
+                    <span class="read-more">Читать далее →</span>
+                </article>
+
+                <!-- Статья 3 -->
+                <article class="journal-card" data-category="atelier" data-article="embroidery">
+                    <div class="journal-meta"><span>Ателье</span><span>18 сен 2026</span></div>
+                    <h3>Ручная работа: вышивка в деталях</h3>
+                    <p>История одного жакета — 40 часов ручной вышивки.</p>
+                    <span class="read-more">Читать далее →</span>
+                </article>
+
+                <!-- Статья 4 -->
+                <article class="journal-card" data-category="fashion" data-article="monochrome">
+                    <div class="journal-meta"><span>Мода</span><span>05 сен 2026</span></div>
+                    <h3>Монохром как язык: почему чёрный не бывает скучным</h3>
+                    <p>Разбираем оттенки, фактуры и слои — от матового кашемира до глянцевой кожи.</p>
+                    <span class="read-more">Читать далее →</span>
+                </article>
+
+                <!-- Статья 5 -->
+                <article class="journal-card" data-category="culture" data-article="paris">
+                    <div class="journal-meta"><span>Культура</span><span>21 авг 2026</span></div>
+                    <h3>Париж после полуночи: город как фон для тёмной моды</h3>
+                    <p>Прогулка по местам, где рождаются образы NOIR.</p>
+                    <span class="read-more">Читать далее →</span>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PAGE 6: CONTACT ========== -->
+    <section class="page" id="page-contact">
+        <div class="container">
+            <div class="contact-layout">
+                <div class="contact-info">
+                    <div class="section-subtitle">Связь</div>
+                    <h2 class="section-title">Контакты</h2>
+                    <p>По вопросам сотрудничества, прессы или индивидуальных заказов свяжитесь с нами.</p>
+                    <div class="contact-details">
+                        <div class="contact-detail"><div class="label">Ателье</div><p>12 Rue de la Paix, 75002 Paris</p></div>
+                        <div class="contact-detail"><div class="label">Почта</div><p>hello@noir-studio.com</p></div>
+                        <div class="contact-detail"><div class="label">Телефон</div><p>+33 1 42 68 53 00</p></div>
+                    </div>
+                </div>
+                <form class="contact-form" onsubmit="event.preventDefault(); alert('Спасибо! Мы свяжемся с вами.');">
+                    <div class="form-group"><label>Имя</label><input type="text" placeholder="Ваше имя" required></div>
+                    <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com" required></div>
+                    <div class="form-group"><label>Тема</label><select><option>Сотрудничество</option><option>Пресса</option><option>Индивидуальный заказ</option><option>Другое</option></select></div>
+                    <div class="form-group"><label>Сообщение</label><textarea placeholder="Ваше сообщение..."></textarea></div>
+                    <button type="submit" class="btn btn-solid form-submit">Отправить</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <span>© 2026 NOIR Studio. Все права защищены.</span>
+        <div class="footer-socials"><a href="#">Instagram</a><a href="#">Telegram</a><a href="#">Pinterest</a></div>
+    </footer>
+
+    <script>
+        // ========== ДАННЫЕ КОЛЛЕКЦИЙ ==========
+        const collectionsData = {
+            monolith: {
+                season: 'Осень / Зима 2026',
+                title: 'Monolith',
+                desc: 'Структурный минимализм, вдохновлённый архитектурой брутализма. Каждая вещь — это монолитная форма, где каждый шов имеет значение. Коллекция исследует границу между одеждой и скульптурой.',
+                items: [
+                    ['Структурный плащ', 'Шерсть / кашемир'],
+                    ['Пальто-кокон', 'Двусторонняя шерсть'],
+                    ['Жакет с архитектурным плечом', 'Вискоза / лён'],
+                    ['Брюки с защипами', 'Плотный хлопок'],
+                    ['Кожаный ремень', 'Натуральная кожа']
+                ],
+                img: 'https://picsum.photos/id/1005/600/800?grayscale'
+            },
+            obsidian: {
+                season: 'Весна / Лето 2025',
+                title: 'Obsidian',
+                desc: 'Текучие формы и обсидиановая палитра. Коллекция о движении, текучести и женственности, скрытой в тёмных тонах. Шёлк и вискоза струятся по телу, создавая эффект жидкого металла.',
+                items: [
+                    ['Шелковое платье- slip', 'Шёлк / сатин'],
+                    ['Асимметричная юбка', 'Вискоза'],
+                    ['Топ с драпировкой', 'Шёлк'],
+                    ['Широкие брюки', 'Лён / вискоза'],
+                    ['Кашемировый кардиган', 'Кашемир']
+                ],
+                img: 'https://picsum.photos/id/1027/600/800?grayscale'
+            },
+            void: {
+                season: 'Осень / Зима 2024',
+                title: 'Void',
+                desc: 'Монохром и текстура. Void — это исследование пустоты и тишины через чёрный цвет. Разные фактуры — от гладкой кожи до грубой шерсти — создают игру света и тени на поверхности одежды.',
+                items: [
+                    ['Кожаная куртка', 'Натуральная кожа'],
+                    ['Вязаный свитер оверсайз', 'Меринос'],
+                    ['Брюки из плотной шерсти', 'Шерсть'],
+                    ['Пальто-халат', 'Шерсть / кашемир'],
+                    ['Ботинки на платформе', 'Кожа']
+                ],
+                img: 'https://picsum.photos/id/1040/600/800?grayscale'
+            },
+            eclipse: {
+                season: 'Весна / Лето 2024',
+                title: 'Eclipse',
+                desc: 'Игра света и тени. Eclipse — это коллекция-затмение, где тёмные тона переплетаются с едва заметными светлыми акцентами. Каждая вещь — как момент между светом и тьмой.',
+                items: [
+                    ['Платье с открытой спиной', 'Шёлк'],
+                    ['Жакет с контрастной строчкой', 'Лён'],
+                    ['Юбка-миди с разрезом', 'Вискоза'],
+                    ['Топ с металлической фурнитурой', 'Шёлк'],
+                    ['Сумка-тоут', 'Кожа']
+                ],
+                img: 'https://picsum.photos/id/1043/600/800?grayscale'
+            },
+            archive: {
+                season: 'Капсула',
+                title: 'Archive 001',
+                desc: 'Переосмысление классики. Archive 001 — это капсула из 5 вещей, которые мы считаем идеальными. Каждая вещь — результат многолетних поисков идеального кроя и материала.',
+                items: [
+                    ['Белая рубашка', 'Хлопок / поплин'],
+                    ['Чёрные брюки', 'Шерсть'],
+                    ['Тренч', 'Хлопок / габардин'],
+                    ['Кашемировый шарф', 'Кашемир'],
+                    ['Кожаные перчатки', 'Кожа']
+                ],
+                img: 'https://picsum.photos/id/1050/600/800?grayscale'
+            }
+        };
+
+        // ========== ДАННЫЕ СТАТЕЙ ==========
+        const articlesData = {
+            'monolith-anatomy': {
+                category: 'Мода',
+                date: '15 окт 2026',
+                title: 'Анатомия тени: как мы создаём коллекцию Monolith',
+                img: 'https://picsum.photos/id/1084/800/600?grayscale',
+                text: [
+                    'Коллекция Monolith началась с одного вопроса: может ли одежда быть скульптурой, оставаясь при этом удобной? Мы провели шесть месяцев в ателье, экспериментируя с плотностью шерсти, направлением нити и архитектурой плеча. Каждый прототип проходил через руки трёх мастеров, прежде чем попасть на примерку.',
+                    'Креативный директор NOIR описывает процесс так: «Мы не рисуем эскизы — мы строим формы. Сначала появляется каркас, потом ткань. Monolith — это про то, как одежда держит пространство вокруг тела, а не облегает его».',
+                    'Ключевой элемент коллекции — пальто-кокон с двусторонней шерстью. Его можно носить наизусть, и каждый раз silhouette будет меняться: от строгого architectural до мягкого, обволакивающего. Именно эта двойственность — суть Monolith.',
+                    'Финальный показ прошёл в бывшем бруталистском бункере в пригороде Парижа. Модели шли по бетонному полу под звук виолончели, и казалось, что одежда сливается со стенами. Это был не показ моды — это был диалог между телом, тканью и архитектурой.',
+                    'Monolith — это приглашение замедлиться. В мире, где всё движется быстро, мы предлагаем вещи, которые требуют времени: на примерку, на привыкание, на любовь. И именно в этом — их главная ценность.'
+                ]
+            },
+            'noir-cinema': {
+                category: 'Культура',
+                date: '02 окт 2026',
+                title: 'Тёмный минимализм в кино',
+                img: 'https://picsum.photos/id/1015/800/600?grayscale',
+                text: [
+                    'Нуар как жанр родился в 1940-х, но его визуальный язык — игра света и тени, контраст, силуэт — до сих пор определяет эстетику тёмной моды. Достаточно вспомнить «Третий человек» Кэрола Рида или «Асфальтовые джунгли» Джона Хьюстона: герои в плащах и шляпах, чьи лица наполовину скрыты тенью.',
+                    'Современные дизайнеры, включая NOIR, часто обращаются к кадрам из фильмов как к референсам. Но речь не о копировании — речь о заимствовании принципа: одежда должна создавать напряжение. Она не украшает — она формирует образ.',
+                    'Интересно, что в нуаре почти нет ярких цветов. Чёрный, серый, белый и оттенки сепии — вот палитра. Это учит дисциплине: когда нет цвета, на первый план выходит форма. Каждый шов, каждая складка становятся частью высказывания.',
+                    'В коллекции Void мы сознательно использовали приём «свет из окна»: верхняя часть вещей остаётся матовой, а нижняя — глянцевой, как будто на неё падает свет из жалюзи. Это прямой кивок в сторону нуара, но переведённый на язык ткани.'
+                ]
+            },
+            'embroidery': {
+                category: 'Ателье',
+                date: '18 сен 2026',
+                title: 'Ручная работа: вышивка в деталях',
+                img: 'https://picsum.photos/id/1024/800/600?grayscale',
+                text: [
+                    'Один жакет из коллекции Eclipse содержит 40 часов ручной вышивки. Это не преувеличение — это факт, который мы фиксируем в паспорте каждой вещи. Вышивка выполняется вручную мастерами, которые работают с шёлковой нитью толщиной 0,2 мм.',
+                    'Процесс начинается с эскиза: художник рисует узор, который затем переносится на ткань. Дальше — кропотливая работа: каждый стежок делается отдельно, с определённым натяжением. Ошибка в 1 мм может нарушить всю композицию, поэтому мастер работает не более 4 часов в день.',
+                    'Мы используем только натуральные нити: шёлк, хлопок, иногда — металлизированное волокно для едва заметного блеска. Синтетика не выдерживает испытания временем: она теряет форму и цвет через несколько лет, тогда как натуральные материалы стареют красиво.',
+                    'Вышивка — это не декор. Это способ сказать что-то важное без слов. В Eclipse узор на жакете повторяет карту ночного неба над Парижем в день основания бренда. Об этом знают немногие — но это и есть тихая роскошь.'
+                ]
+            },
+            'monochrome': {
+                category: 'Мода',
+                date: '05 сен 2026',
+                title: 'Монохром как язык: почему чёрный не бывает скучным',
+                img: 'https://picsum.photos/id/1039/800/600?grayscale',
+                text: [
+                    'Чёрный — это не отсутствие цвета, а его концентрация. В зависимости от фактуры и освещения он может быть холодным, как обсидиан, или тёплым, как уголь. Задача дизайнера — выстроить диалог между оттенками и текстурами.',
+                    'В коллекции Void мы использовали пять разных фактур чёрного: гладкая кожа, матовый кашемир, шелковистый вискоз, грубая шерсть и техничный нейлон. При дневном свете они выглядят почти одинаково, но при искусственном — начинают играть, создавая глубину.',
+                    'Монохром требует дисциплины. Нельзя спрятаться за ярким принтом — каждая ошибка кроя видна сразу. Именно поэтому мы уделяем такое внимание посадке: если вещь сидит идеально, она не нуждается в декоре.',
+                    'Совет от NOIR: если вы носите тотал-чёрный, добавьте один акцент — металлическую фурнитуру, кожаный ремень или обувь с текстурой. Это создаст точку опоры для взгляда и не даст образу «провалиться».'
+                ]
+            },
+            'paris': {
+                category: 'Культура',
+                date: '21 авг 2026',
+                title: 'Париж после полуночи: город как фон для тёмной моды',
+                img: 'https://picsum.photos/id/1067/800/600?grayscale',
+                text: [
+                    'Париж — это не только город света. После полуночи он становится городом тени: витрины гаснут, улицы пустеют, и остаётся только архитектура — каменные фасады, чугунные балконы, мокрый асфальт. Именно в эти часы рождаются образы NOIR.',
+                    'Наш ателье находится в 2-м округе, недалеко от Rue de la Paix. Вечером мы часто выходим на прогулку без цели — просто чтобы почувствовать ритм города. Иногда идея для новой коллекции приходит именно так: из отражения фонаря в луже или из силуэта прохожего в длинном пальто.',
+                    'Есть места, которые мы называем «точками NOIR»: Passage des Panoramas с его стеклянной крышей, набережная Сены у моста Александра III, двор Пале-Рояля в дождь. Все они — про контраст света и тени, про геометрию и тишину.',
+                    'Мы не делаем одежду «для Парижа». Мы делаем одежду, которая чувствует себя в Париже как дома. И это, возможно, лучший комплимент, который можно сказать коллекции.'
+                ]
+            }
+        };
+
+        // ========== НАВИГАЦИЯ ==========
+        const navLinks = document.querySelectorAll('[data-page]');
+        const pages = document.querySelectorAll('.page');
+        const nav = document.getElementById('mainNav');
+        const navToggle = document.getElementById('navToggle');
+        const navLinksContainer = document.getElementById('navLinks');
+
+        function switchPage(pageId) {
+            pages.forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + pageId);
+            if (target) { target.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            document.querySelectorAll('.nav-links a').forEach(a => { a.classList.toggle('active', a.dataset.page === pageId); });
+            navLinksContainer.classList.remove('open');
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => { e.preventDefault(); switchPage(link.dataset.page); });
+        });
+
+        navToggle.addEventListener('click', () => { navLinksContainer.classList.toggle('open'); });
+
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            if (currentScroll > lastScroll && currentScroll > 200) { nav.classList.add('hidden'); }
+            else { nav.classList.remove('hidden'); }
+            lastScroll = currentScroll;
+        });
+
+        // ========== МОДАЛЬНОЕ ОКНО КОЛЛЕКЦИЙ ==========
+        const modal = document.getElementById('collectionModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalImage = document.getElementById('modalImage');
+        const modalSeason = document.getElementById('modalSeason');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalItems = document.getElementById('modalItems');
+        const modalBtn = document.getElementById('modalBtn');
+
+        document.querySelectorAll('.collection-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const key = item.dataset.collection;
+                const data = collectionsData[key];
+                if (!data) return;
+                modalImage.style.backgroundImage = `url('${data.img}')`;
+                modalSeason.textContent = data.season;
+                modalTitle.textContent = data.title;
+                modalDesc.textContent = data.desc;
+                modalItems.innerHTML = data.items.map(i => `<li><span>${i[0]}</span><span>${i[1]}</span></li>`).join('');
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeCollectionModal() {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeCollectionModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeCollectionModal(); });
+
+        modalBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeCollectionModal();
+            switchPage('lookbook');
+        });
+
+        // ========== МОДАЛЬНОЕ ОКНО СТАТЕЙ ==========
+        const articleModal = document.getElementById('articleModal');
+        const articleClose = document.getElementById('articleClose');
+        const articleHero = document.getElementById('articleHero');
+        const articleMeta = document.getElementById('articleMeta');
+        const articleTitle = document.getElementById('articleTitle');
+        const articleText = document.getElementById('articleText');
+
+        function openArticle(key) {
+            const data = articlesData[key];
+            if (!data) return;
+            articleHero.style.backgroundImage = `url('${data.img}')`;
+            articleMeta.innerHTML = `<span>${data.category}</span><span>${data.date}</span>`;
+            articleTitle.textContent = data.title;
+            articleText.innerHTML = data.text.map(p => `<p>${p}</p>`).join('');
+            articleModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            articleModal.querySelector('.article-modal').scrollTop = 0;
+        }
+
+        function closeArticleModal() {
+            articleModal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        document.querySelectorAll('.journal-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const key = card.dataset.article;
+                if (key) openArticle(key);
+            });
+        });
+
+        articleClose.addEventListener('click', closeArticleModal);
+        articleModal.addEventListener('click', (e) => { if (e.target === articleModal) closeArticleModal(); });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCollectionModal();
+                closeArticleModal();
+            }
+        });
+
+        // ========== ФИЛЬТРЫ ЖУРНАЛА ==========
+        const filterBtns = document.querySelectorAll('#journalFilters span');
+        const journalCards = document.querySelectorAll('#journalGrid .journal-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const filter = btn.dataset.filter;
+                journalCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // Инициализация
+        switchPage('home');
+    </script>
+</body>
+</html>
